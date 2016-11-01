@@ -57,4 +57,12 @@ public class StockData {
     public void setLastUpdated(long lastUpdate) {
         this.lastUpdate = lastUpdate;
     }
+        
+       public String getQuotes(){
+        return   this.getSymbol() + "\n" +
+        "price : " + this.getPrice() + "\n" +
+        "Change : " + this.getChange() + "\n" +
+        "Last Updated : " + this.getLastUpdated() + "\n\n";
+    }
+
 }
