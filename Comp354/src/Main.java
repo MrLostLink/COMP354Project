@@ -1,10 +1,6 @@
-/**
- * Created by Kendy on 2016-10-16.
- */
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
+package Comp354;
+
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Main {
@@ -15,46 +11,40 @@ public class Main {
                 "GS", "HD", "IBM", "INTC", "JNJ", "JPM", "MCD", "MMM", "MRK", "MSFT",
                 "NKE", "PFE", "PG", "TRV", "UNH", "UTX", "V", "VZ", "WMT", "DIS"};
 
-
         YahooQuoteFetcher fetcher = new YahooQuoteFetcher(5.0);
-        StockData stockName;
-
+        MovingAverage historicalFetcher = new MovingAverage(5.0);
+        Scanner reader = new Scanner(System.in);  // Reading from System.in
         System.out.println("Please select from the stock list below by inputing its corresponding # (1 - 30) \n\n");
+        boolean validEntry = false;
         try {
             for (int i = 0; i < Dow30Ticker.length; i++) {
-                stockName = fetcher.getData(Dow30Ticker[i]);
-                System.out.println(i + 1 + " - " + Dow30Ticker[i] + " - " + stockName.getName());
+                StockData stockName = fetcher.getData(Dow30Ticker[i]);
+                System.out.println(i + 1 + " - " + stockName.getSymbol() + " - " + stockName.getName());
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        //user Input
+        int input = 0;
+        int input2 = 0;
 
-        Scanner reader = new Scanner(System.in);  // Reading from System.in
-        int input = reader.nextInt();
-
-//        BufferedReader sampleData = null;
-//
-//        try {
-//            //reading from the CSV file provided
-//            String line;
-//            sampleData = new BufferedReader(new FileReader("F:\\Comp354\\Comp354project\\Sampledata.csv"));
-//
-//            // How to read file in java line by line?
-//            while ((line = sampleData.readLine()) != null) {
-//                System.out.println("Raw CSV data: " + line);
-//                System.out.println("Converted ArrayList data: " + LineCSVtoArrayList(line) + "\n");
-//            }
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//         } finally {
-//            try {
-//                if (sampleData != null) sampleData.close();
-//           } catch (IOException crunchifyException) {
-//                crunchifyException.printStackTrace();
-//            }
-//
-//       }
+        //Validate user entry
+        do {
+            try {
+                System.out.println("\nPlease choose a number from the list");
+                input = reader.nextInt();
+                if (input <= 30 && input >= 1)
+                    validEntry = true;
+                else
+                    validEntry = false;
+            } catch (InputMismatchException exception) {
+                validEntry = false;
+                System.out.println("This is not an integer");
+            }
+            catch (Exception e) {
+            e.printStackTrace();
+            }
+        } while (!validEntry);
 
         //Read for the source itself from URL
         try {
@@ -63,22 +53,33 @@ public class Main {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-        // Utility which converts CSV to ArrayList using Split Operation
-        public static ArrayList<String> LineCSVtoArrayList (String LineCSV){
-            ArrayList<String> crunchifyResult = new ArrayList<String>();
-
-            if (LineCSV != null) {
-                String[] splitData = LineCSV.split("\\s*,\\s*");
-                for (int i = 0; i < splitData.length; i++) {
-                    if (!(splitData[i] == null) || !(splitData[i].length() == 0)) {
-                        crunchifyResult.add(splitData[i].trim());
-                    }
-                }
+        //Validate user entry
+        do {
+            try {
+                StockData stockName = fetcher.getData(Dow30Ticker[input - 1]);
+                System.out.println("Would you like to get the historical Data and Moving average for " + Dow30Ticker[input - 1] + " - " + stockName.getName() + " ?\n" + "1. Yes\n" + "2. No\n");
+                input2 = reader.nextInt();
+                if (input2 == 2 || input2 == 1)
+                    validEntry = true;
+                else
+                    validEntry = false;
+            } catch (InputMismatchException exception) {
+                System.out.println("This is not an integer, enter 1 or 2");
+                validEntry = false;
+            } catch (Exception e) {
+                e.printStackTrace();
+                validEntry = false;
             }
-            return crunchifyResult;
-        }
 
+        } while (!validEntry);
 
+        if (input2 == 1) {
+            try {
+                historicalFetcher.getData(Dow30Ticker[input - 1]);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else
+            System.exit(0);
+    }
 }

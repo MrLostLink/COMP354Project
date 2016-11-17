@@ -1,16 +1,17 @@
+package Comp354;
 import java.text.DecimalFormat;
 /**
  * Created by Kendy on 2016-10-16.
  */
 public class StockData {
 
-        String	symbol;
-        String name;
-        double	price;
-        double	change;
-        long	volume;
-        long	lastUpdate;
-        DecimalFormat decimalFormat = new DecimalFormat("#,##0");
+    String	symbol;
+    String name;
+    double	price;
+    double	change;
+    long	volume;
+    long	lastUpdate;
+    DecimalFormat decimalFormat = new DecimalFormat("#,##0");
 
     public String getSymbol() {
         return symbol;
@@ -74,9 +75,9 @@ public class StockData {
     public String getQuotes(){
         return   "Ticker Symbol: " + this.getSymbol() + "\n" +
                 "Company name: " + this.getName() + "\n" +
-        "Price of Stock: $"  + this.getPrice() + "\n" +
-        "Change : " + this.getChange() + "\n" +
-        "Volume : " + decimalFormat.format(this.getVolume()) + "\n\n";
+                "Price of Stock: $"  + this.getPrice() + "\n" +
+                "Change : " + this.getChange() + "\n" +
+                "Volume : " + decimalFormat.format(this.getVolume()) + "\n\n";
     }
 
 }
