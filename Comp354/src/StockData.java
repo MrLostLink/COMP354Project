@@ -4,15 +4,27 @@ import java.text.DecimalFormat;
  */
 public class StockData {
 
-        String	symbol;
-        String name;
-        double	price;
-        double	change;
-        long	volume;
-        long	lastUpdate;
-        DecimalFormat decimalFormat = new DecimalFormat("#,##0");
+    String	symbol;
+    String name;
+    double	price;
+    double	change;
+    long	volume;
+    long	lastUpdate;
+    DecimalFormat decimalFormat = new DecimalFormat("#,##0");
 
-    public String getSymbol() {
+    public StockData(){}
+    
+    public StockData(String symbol, String name, double price, double change, long volume, long lastUpdate) {
+		super();
+		this.symbol = symbol;
+		this.name = name;
+		this.price = price;
+		this.change = change;
+		this.volume = volume;
+		this.lastUpdate = lastUpdate;
+	}
+
+	public String getSymbol() {
         return symbol;
     }
 
@@ -74,9 +86,9 @@ public class StockData {
     public String getQuotes(){
         return   "Ticker Symbol: " + this.getSymbol() + "\n" +
                 "Company name: " + this.getName() + "\n" +
-        "Price of Stock: $"  + this.getPrice() + "\n" +
-        "Change : " + this.getChange() + "\n" +
-        "Volume : " + decimalFormat.format(this.getVolume()) + "\n\n";
+                "Price of Stock: $"  + this.getPrice() + "\n" +
+                "Change : " + this.getChange() + "\n" +
+                "Volume : " + decimalFormat.format(this.getVolume()) + "\n\n";
     }
 
 }
