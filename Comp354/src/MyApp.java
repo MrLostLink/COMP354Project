@@ -13,6 +13,7 @@ import org.jfree.data.category.DefaultCategoryDataset;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -118,8 +119,16 @@ public class MyApp {
 		
 		
 		JPanel graphPanel = new JPanel();
-		graphPanel.setBounds(10, 95, 744, 449);
+		graphPanel.setBounds(10, 105, 744, 449);
 		frame.getContentPane().add(graphPanel);
+		
+		JLabel PR = new JLabel("Purchase Recommendation :");
+		PR.setBounds(138, 91, 175, 14);
+		frame.getContentPane().add(PR);
+		
+		JLabel Recommendation = new JLabel("");
+		Recommendation.setBounds(315, 91, 175, 14);
+		frame.getContentPane().add(Recommendation);
 		
 		/*
 		 * Action performed will create Graph based on dataset
@@ -135,6 +144,7 @@ public class MyApp {
 					 * 		- Calculating the difference in days to establish whether or not 
 					 * 		  the data will be calculated in days or weeks or months
 					 */
+					
 					Calendar startDate = new GregorianCalendar();
 					startDate.setTime(dateFrom.getDate());
 					Calendar endDate = new GregorianCalendar();
@@ -144,6 +154,7 @@ public class MyApp {
 						
 						//Testing - Console Print
 						System.out.println("Start Date: " + startDate.getTime() + "\nEnd Date: " + endDate.getTime() + "\nDifference in Days: " + diffDays);
+						
 					
 					/*
 					 * 	Fetching the data using the YahooFinance API
@@ -173,15 +184,23 @@ public class MyApp {
 					
 					DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
 					
+					Collections.reverse(dataList);
 					/*
 					 * Insert Data Set Here
 					 */
-					int count = 0;
+					
+					long totalAmountPre = 0;
+					int count = 1;
 					for(HistoricalQuote item: dataList){
 						System.out.println(item.getDate() + ": " + item.getHigh());
-						dataSet.addValue(item.getHigh(), "data", Integer.toString(count++));
+						dataSet.addValue(item.getClose(), "data", Integer.toString(count));
+						totalAmountPre += item.getClose().longValue();
+						
+						dataSet.addValue(totalAmountPre/count, "Simple Moving Average", Integer.toString(count++));
 					}
-					
+		
+					String recommendation = StockRecommendation(stock);
+					Recommendation.setText(recommendation);
 					
 					JFreeChart graph = null;
 					/*
@@ -204,6 +223,7 @@ public class MyApp {
 					graphPanel.removeAll();
 					graphPanel.add(graphingPanel, BorderLayout.CENTER);
 					graphPanel.validate();
+					
 			}
 		});
 		btnNewButton.setBounds(406, 8, 89, 76);
@@ -223,6 +243,22 @@ public class MyApp {
 			e.printStackTrace();
 		}
     
+	}
+	
+	//recommendation module
+	public String StockRecommendation(Stock astock) {
+		double priceOfStock = stock.getQuote().getPrice().doubleValue();
+		System.out.println("Price of the stock : " + priceOfStock);
+		double fiftyDayMA = stock.getQuote().getPriceAvg50().doubleValue();
+		System.out.println("50 days moving average : " + fiftyDayMA);
+		
+		//Formulae from recommendation
+		if(priceOfStock < fiftyDayMA - 5.00)
+			return "high";
+		else if (priceOfStock > fiftyDayMA)
+			return "Low";
+		else
+			return "medium";
 	}
 }
 
