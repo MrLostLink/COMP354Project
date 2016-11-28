@@ -4,10 +4,7 @@ import javax.swing.JFrame;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.axis.NumberTickUnit;
 import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 import java.awt.BorderLayout;
@@ -16,6 +13,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -33,9 +31,10 @@ import java.io.IOException;
 import java.awt.event.ActionEvent;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JToolBar;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 
 public class MyApp {
 
@@ -206,9 +205,14 @@ public class MyApp {
 							dataList = stock.getHistory(startDate, endDate, selectedInterval);
 						}
 					} catch (IOException e1) {
-						// TODO Auto-generated catch block
+						JOptionPane.showMessageDialog(frame,
+							    "Make sure you are connected to the Internet.\n" +
+							    "Contact your system admin if error continues.", 
+							    "An Error has occured.",
+							    JOptionPane.ERROR_MESSAGE);
+						System.exit(0);
 						e1.printStackTrace();
-					}
+					} 
 
 					StockList currentSL = new StockList(companyBox.getSelectedItem().toString(), todaysDate, startDate.getTime(), endDate.getTime(), selectedInterval);
 					DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
@@ -232,7 +236,6 @@ public class MyApp {
 						history.addToHistory(currentSL);
 						System.out.println(history.getStackSize());
 					} catch (Exception e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 					
@@ -266,18 +269,51 @@ public class MyApp {
 		btnNewButton.setBounds(406, 8, 89, 76);
 		frame.getContentPane().add(btnNewButton);
 		
+		/*
+		 * Implementing the Menu Bar
+		 */
 		JMenuBar menuBar = new JMenuBar();
 		frame.setJMenuBar(menuBar);
 		
+		/*
+		 * Corresponds to the File Tab 
+		 * 	Current options available: Exit
+		 */
 		JMenu mnFile = new JMenu("File");
 		menuBar.add(mnFile);
 		
+		JMenuItem mntmExit = new JMenuItem("Exit");
+		mntmExit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				System.exit(0);
+			}
+		});
+		
+		mnFile.add(mntmExit);
+		
+		/*
+		 * Corresponds to the History Tab
+		 * 	Iterates through the last 5 searches and displays them for offline purposes
+		 */
 		JMenu mnHistory = new JMenu("History");
+				History history = new History();
+				Iterator<StockList> ite = history.getStackIterator();
+				while(ite.hasNext()){
+					StockList item = ite.next();
+					JMenuItem itemM = new JMenuItem(item.getSymbol() +" - " + item.getCreatedOn());
+					itemM.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent arg0) {
+							System.exit(0);
+						}
+					});
+					mnHistory.add(itemM);
+				}
 		menuBar.add(mnHistory);
 		
 		
 	}
 	
+	@SuppressWarnings("unused")
 	public static void getData(String input, DefaultCategoryDataset dataSet){
 		YahooQuoteFetcher fetcher = new YahooQuoteFetcher(5.0);
         StockData stockName;
@@ -285,7 +321,6 @@ public class MyApp {
         try {
 			stockName = fetcher.getData(input);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     

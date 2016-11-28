@@ -52,6 +52,10 @@ public class History{
 		
 	}
 
+	public Iterator<StockList> getStackIterator(){
+		Iterator<StockList> ite =  stack.iterator();
+		return ite;
+	}
 	public int getStackSize() {
 		return stackSize;
 	}
