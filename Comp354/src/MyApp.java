@@ -33,6 +33,9 @@ import java.io.IOException;
 import java.awt.event.ActionEvent;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JToolBar;
+import javax.swing.JMenuBar;
+import javax.swing.JMenu;
 
 public class MyApp {
 
@@ -71,6 +74,9 @@ public class MyApp {
 	 */
 	@SuppressWarnings("deprecation")
 	private void initialize() {
+		/*
+		 * Overall Frame of Application
+		 */
 		frame = new JFrame();
 		frame.setBounds(100, 100, 780, 650);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -79,35 +85,53 @@ public class MyApp {
 		todaysDate.getDate();
 		Date minDate = new Date(todaysDate.getYear()-5, todaysDate.getMonth(), todaysDate.getDay());
 		
+		/*
+		 * A Label
+		 */
 		JLabel lblNewLabel = new JLabel("Company Name:");
 		lblNewLabel.setBounds(138, 8, 128, 14);
 		frame.getContentPane().add(lblNewLabel);
 		
+		/*
+		 * GUI Button to select starting Date
+		 */
 		JDateChooser dateFrom = new JDateChooser();
 		dateFrom.setMinSelectableDate(minDate);
 		dateFrom.setBounds(276, 33, 128, 20);
 		dateFrom.setMaxSelectableDate(todaysDate);
 		frame.getContentPane().add(dateFrom);
 		
+		/*
+		 * GUI Button to select ending Date
+		 *  > Action Event: Verifies starting date for any discrepancies 
+		 */
 		JDateChooser dateUntil = new JDateChooser();
 		dateUntil.getCalendarButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				dateUntil.setMinSelectableDate(dateFrom.getDate());
 			}
 		});
-		
 		dateUntil.setBounds(276, 64, 128, 20);
 		dateUntil.setMaxSelectableDate(todaysDate);
 		frame.getContentPane().add(dateUntil);
 		
+		/*
+		 *  A Label
+		 */
 		JLabel lblFrom = new JLabel("From:");
 		lblFrom.setBounds(138, 33, 128, 14);
 		frame.getContentPane().add(lblFrom);
 		
+		/*
+		 *  A Label
+		 */
 		JLabel lblUntil = new JLabel("Until:");
 		lblUntil.setBounds(138, 64, 128, 14);
 		frame.getContentPane().add(lblUntil);
 		
+		/*
+		 *  List of Combo items corresponding to available companies 
+		 */
 		JComboBox<ComboItem> companyBox = new JComboBox<ComboItem>();
 		companyBox.setEditable(true);
 		companyBox.setBounds(276, 5, 128, 20);
@@ -136,13 +160,14 @@ public class MyApp {
 		JButton btnNewButton = new JButton("Calculate");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-					
+				
 					int choice = 0;
+					Interval selectedInterval = null;
 					/*
 					 * Everything Date Related; 
 					 * 		- Setting variables for start date and end date
 					 * 		- Calculating the difference in days to establish whether or not 
-					 * 		  the data will be calculated in days or weeks or months
+					 * 		  the data will be calculated in days or weeks or months (Interval)
 					 */
 					
 					Calendar startDate = new GregorianCalendar();
@@ -164,41 +189,53 @@ public class MyApp {
 						stock = YahooFinance.get(companyBox.getSelectedItem().toString());
 						if(diffDays<60){
 							choice = 1;
+							selectedInterval = Interval.DAILY;
 							System.out.println("X Axis: Day");
-							dataList = stock.getHistory(startDate, endDate, Interval.DAILY);
+							dataList = stock.getHistory(startDate, endDate, selectedInterval);
 						}
 						else if(diffDays>60 && diffDays<365){
 							choice = 2;
+							selectedInterval = Interval.WEEKLY;
 							System.out.println("X Axis: Week");
-							dataList = stock.getHistory(startDate, endDate, Interval.WEEKLY);
+							dataList = stock.getHistory(startDate, endDate, selectedInterval);
 						}
 						else{
 							choice = 3;
+							selectedInterval = Interval.MONTHLY;
 							System.out.println("X Axis: Month");
-							dataList = stock.getHistory(startDate, endDate, Interval.MONTHLY);
+							dataList = stock.getHistory(startDate, endDate, selectedInterval);
 						}
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
-					
+
+					StockList currentSL = new StockList(companyBox.getSelectedItem().toString(), todaysDate, startDate.getTime(), endDate.getTime(), selectedInterval);
 					DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
-					
 					Collections.reverse(dataList);
+					
 					/*
 					 * Insert Data Set Here
 					 */
-					
 					long totalAmountPre = 0;
 					int count = 1;
 					for(HistoricalQuote item: dataList){
 						System.out.println(item.getDate() + ": " + item.getHigh());
 						dataSet.addValue(item.getClose(), "data", Integer.toString(count));
 						totalAmountPre += item.getClose().longValue();
-						
 						dataSet.addValue(totalAmountPre/count, "Simple Moving Average", Integer.toString(count++));
+						currentSL.addToStockList(item);
 					}
-		
+					
+					History history = new History();
+					try {
+						history.addToHistory(currentSL);
+						System.out.println(history.getStackSize());
+					} catch (Exception e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					
 					String recommendation = StockRecommendation(stock);
 					Recommendation.setText(recommendation);
 					
@@ -207,13 +244,13 @@ public class MyApp {
 					 * Customize Graph Here
 					 */
 					if(choice == 1){
-						graph = ChartFactory.createLineChart("High Market Price of " + companyBox.getSelectedItem().toString(), "No of Days from Selected Date", "Price ($)", dataSet);
+						graph = ChartFactory.createLineChart("Close Market Price of " + companyBox.getSelectedItem().toString(), "No of Days from Selected Date", "Price ($)", dataSet);
 					}
 					else if(choice == 2){
-						graph = ChartFactory.createLineChart("High Market Price of " + companyBox.getSelectedItem().toString(), "No of Weeks from Selected Date", "Price ($)", dataSet);
+						graph = ChartFactory.createLineChart("Close Market Price of " + companyBox.getSelectedItem().toString(), "No of Weeks from Selected Date", "Price ($)", dataSet);
 					}
 					else if(choice == 3){
-						graph = ChartFactory.createLineChart("High Market Price of " + companyBox.getSelectedItem().toString(), "No of Months from Selected Date", "Price ($)", dataSet);
+						graph = ChartFactory.createLineChart("Close Market Price of " + companyBox.getSelectedItem().toString(), "No of Months from Selected Date", "Price ($)", dataSet);
 					}	
 					CategoryPlot graphPlot = graph.getCategoryPlot();
 					graphPlot.setRangeGridlinePaint(Color.CYAN);
@@ -228,6 +265,15 @@ public class MyApp {
 		});
 		btnNewButton.setBounds(406, 8, 89, 76);
 		frame.getContentPane().add(btnNewButton);
+		
+		JMenuBar menuBar = new JMenuBar();
+		frame.setJMenuBar(menuBar);
+		
+		JMenu mnFile = new JMenu("File");
+		menuBar.add(mnFile);
+		
+		JMenu mnHistory = new JMenu("History");
+		menuBar.add(mnHistory);
 		
 		
 	}
@@ -254,39 +300,10 @@ public class MyApp {
 		
 		//Formulae from recommendation
 		if(priceOfStock < fiftyDayMA - 5.00)
-			return "high";
+			return "High";
 		else if (priceOfStock > fiftyDayMA)
 			return "Low";
 		else
-			return "medium";
+			return "Medium";
 	}
-}
-
-class ComboItem{
-	
-	    private String key;
-	    private String value;
-
-	    public ComboItem(String key, String value)
-	    {
-	        this.key = key;
-	        this.value = value;
-	    }
-
-	    @Override
-	    public String toString()
-	    {
-	        return key;
-	    }
-
-	    public String getKey()
-	    {
-	        return key;
-	    }
-
-	    public String getValue()
-	    {
-	        return value;
-	    }
-	
 }

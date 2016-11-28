@@ -1,94 +1,107 @@
+import java.io.Serializable;
 import java.text.DecimalFormat;
+import java.util.Date;
 /**
  * Created by Kendy on 2016-10-16.
  */
-public class StockData {
+public class StockData implements Serializable{
 
-    String	symbol;
-    String name;
-    double	price;
-    double	change;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	String	symbol;
+    double	highPrice;
+    double  lowPrice;
+    double  closePrice;
     long	volume;
-    long	lastUpdate;
+    double  openPrice;
+    Date	stockDate;
     DecimalFormat decimalFormat = new DecimalFormat("#,##0");
 
     public StockData(){}
     
-    public StockData(String symbol, String name, double price, double change, long volume, long lastUpdate) {
+    public StockData(String symbol, double highPrice, double lowPrice, double closePrice, double openPrice, long volume, Date stockDate) {
 		super();
 		this.symbol = symbol;
-		this.name = name;
-		this.price = price;
-		this.change = change;
+		this.highPrice = highPrice;
+		this.lowPrice = lowPrice;
+		this.closePrice = closePrice;
 		this.volume = volume;
-		this.lastUpdate = lastUpdate;
+		this.stockDate = stockDate;
+		this.openPrice =openPrice;
 	}
 
 	public String getSymbol() {
-        return symbol;
-    }
+		return symbol;
+	}
 
-    public void setSymbol(String symbol) {
-        this.symbol = symbol;
-    }
+	public void setSymbol(String symbol) {
+		this.symbol = symbol;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public double getHighPrice() {
+		return highPrice;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public void setHighPrice(double highPrice) {
+		this.highPrice = highPrice;
+	}
 
+	public double getLowPrice() {
+		return lowPrice;
+	}
 
+	public void setLowPrice(double lowPrice) {
+		this.lowPrice = lowPrice;
+	}
 
-    public double getPrice() {
-        return price;
-    }
+	public double getClosePrice() {
+		return closePrice;
+	}
 
-    public void setPrice(double price) {
-        this.price = price;
-    }
+	public void setClosePrice(double closePrice) {
+		this.closePrice = closePrice;
+	}
 
-    public double getChange() {
-        return change;
-    }
+	public long getVolume() {
+		return volume;
+	}
 
-    public void setChange(double change) {
-        this.change = change;
-    }
+	public void setVolume(long volume) {
+		this.volume = volume;
+	}
 
+	public Date getStockDate() {
+		return stockDate;
+	}
 
-    /**
-     * @return the volume
-     */
-    public double getVolume() {
+	public void setStockDate(Date stockDate) {
+		this.stockDate = stockDate;
+	}
 
-        return volume;
-    }
+	public DecimalFormat getDecimalFormat() {
+		return decimalFormat;
+	}
 
-    /**
-     * @param volume the volume to set
-     */
-    public void setVolume(long volume) {
+	public void setDecimalFormat(DecimalFormat decimalFormat) {
+		this.decimalFormat = decimalFormat;
+	}
 
-        this.volume = volume;
-    }
-
-    public long getLastUpdated() {
-        return lastUpdate;
-    }
-
-    public void setLastUpdated(long lastUpdate) {
-        this.lastUpdate = lastUpdate;
-    }
-
-    public String getQuotes(){
+	public double getOpenPrice(){
+		return openPrice;
+	}
+	
+	public void setOpenPrice(double openPrice){
+		this.openPrice = openPrice;
+	}
+	public String getQuotes(){
         return   "Ticker Symbol: " + this.getSymbol() + "\n" +
-                "Company name: " + this.getName() + "\n" +
-                "Price of Stock: $"  + this.getPrice() + "\n" +
-                "Change : " + this.getChange() + "\n" +
-                "Volume : " + decimalFormat.format(this.getVolume()) + "\n\n";
+                "High Price of Stock: $"  + this.getHighPrice() + "\n" +
+                "Low Price of Stock: $"  + this.getHighPrice() + "\n" +
+                "Close Price of Stock: $"  + this.getHighPrice() + "\n" +
+                "Volume : " + decimalFormat.format(this.getVolume()) + "\n\n" +
+                "Stock Date: " + stockDate.getTime();
     }
 
 }
