@@ -1,4 +1,7 @@
-
+/*
+ * Class used only for Combo Box frame on GUI; corresponds to a Combo Node
+ * 
+ */
 public class ComboItem {
 
 	    private String key;

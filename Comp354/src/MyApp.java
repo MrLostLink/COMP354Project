@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
 import com.toedter.calendar.JDateChooser;
 
 import yahoofinance.Stock;
@@ -35,15 +36,20 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JDesktopPane;
 
 public class MyApp {
 
+	/*
+	 * Declaration of Variables
+	 */
 	private String[] Dow30Ticker = {"AAPL", "AXP", "BA", "CAT", "CSCO", "CVX", "KO", "DD", "XOM", "GE",
             "GS", "HD", "IBM", "INTC", "JNJ", "JPM", "MCD", "MMM", "MRK", "MSFT",
             "NKE", "PFE", "PG", "TRV", "UNH", "UTX", "V", "VZ", "WMT", "DIS"};
 	private Stock stock;
 	private List<HistoricalQuote> dataList;
 	private JFrame frame;
+	private int aCount;
 	
 	/**
 	 * Launch the application.
@@ -83,6 +89,37 @@ public class MyApp {
 		Date todaysDate = new Date();
 		todaysDate.getDate();
 		Date minDate = new Date(todaysDate.getYear()-5, todaysDate.getMonth(), todaysDate.getDay());
+		
+		/*
+		 * Implementing the Menu Bar
+		 */
+		JMenuBar menuBar = new JMenuBar();
+		
+		/*
+		 * Corresponds to the File Tab 
+		 * 	Current options available: Exit
+		 */
+		JMenu mnFile = new JMenu("File");
+		menuBar.add(mnFile);
+	
+		JMenuItem mntmExit = new JMenuItem("Exit");
+		mntmExit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				System.exit(0);
+			}
+		});
+		mnFile.add(mntmExit);
+		
+		/*
+		 * Corresponds to the History Tab
+		 * 	Iterates through the last 5 searches and displays them for offline purposes
+		 */
+		JMenu mnHistory = new JMenu("History");
+		History history = new History();
+		menuBar.add(mnHistory);
+		createHistoryMenu(mnHistory, menuBar, history);
+		frame.setJMenuBar(menuBar);
+		
 		
 		/*
 		 * A Label
@@ -231,6 +268,14 @@ public class MyApp {
 						currentSL.addToStockList(item);
 					}
 					
+					/*
+					 * Assigning a recommendation whether stock should be purchased or not based on 
+					 * calculated MA using equation StockRemendation(Stock stock)
+					 */
+					String recommendation = StockRecommendation(stock);
+					Recommendation.setText(recommendation);
+					
+					currentSL.setRecommendation(recommendation);
 					History history = new History();
 					try {
 						history.addToHistory(currentSL);
@@ -238,11 +283,8 @@ public class MyApp {
 					} catch (Exception e1) {
 						e1.printStackTrace();
 					}
-					
-					String recommendation = StockRecommendation(stock);
-					Recommendation.setText(recommendation);
-					
 					JFreeChart graph = null;
+					
 					/*
 					 * Customize Graph Here
 					 */
@@ -264,69 +306,25 @@ public class MyApp {
 					graphPanel.add(graphingPanel, BorderLayout.CENTER);
 					graphPanel.validate();
 					
+					/*
+					 * Update History Tab with new search history
+					 */
+					createHistoryMenu(mnHistory,menuBar, history);
+
 			}
 		});
 		btnNewButton.setBounds(406, 8, 89, 76);
 		frame.getContentPane().add(btnNewButton);
 		
-		/*
-		 * Implementing the Menu Bar
-		 */
-		JMenuBar menuBar = new JMenuBar();
-		frame.setJMenuBar(menuBar);
-		
-		/*
-		 * Corresponds to the File Tab 
-		 * 	Current options available: Exit
-		 */
-		JMenu mnFile = new JMenu("File");
-		menuBar.add(mnFile);
-		
-		JMenuItem mntmExit = new JMenuItem("Exit");
-		mntmExit.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				System.exit(0);
-			}
-		});
-		
-		mnFile.add(mntmExit);
-		
-		/*
-		 * Corresponds to the History Tab
-		 * 	Iterates through the last 5 searches and displays them for offline purposes
-		 */
-		JMenu mnHistory = new JMenu("History");
-				History history = new History();
-				Iterator<StockList> ite = history.getStackIterator();
-				while(ite.hasNext()){
-					StockList item = ite.next();
-					JMenuItem itemM = new JMenuItem(item.getSymbol() +" - " + item.getCreatedOn());
-					itemM.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent arg0) {
-							System.exit(0);
-						}
-					});
-					mnHistory.add(itemM);
-				}
-		menuBar.add(mnHistory);
-		
+		JDesktopPane desktopPane = new JDesktopPane();
+		desktopPane.setBounds(556, 64, 1, 1);
+		frame.getContentPane().add(desktopPane);		
 		
 	}
 	
-	@SuppressWarnings("unused")
-	public static void getData(String input, DefaultCategoryDataset dataSet){
-		YahooQuoteFetcher fetcher = new YahooQuoteFetcher(5.0);
-        StockData stockName;
-        
-        try {
-			stockName = fetcher.getData(input);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-    
-	}
-	
-	//recommendation module
+	/*
+	 *	Recommendation method
+	 */
 	public String StockRecommendation(Stock astock) {
 		double priceOfStock = stock.getQuote().getPrice().doubleValue();
 		System.out.println("Price of the stock : " + priceOfStock);
@@ -341,4 +339,24 @@ public class MyApp {
 		else
 			return "Medium";
 	}
+	
+	/*
+	 * Corresponds to the History Tab
+	 * 	Iterates through the last 5 searches and displays them for offline purposes
+	 */
+	public void createHistoryMenu(JMenu mnHistory, JMenuBar jmenu, History history){
+				mnHistory.removeAll();
+				Iterator<StockList> ite = history.getStackIterator();
+				aCount = history.getStackSize();
+				while(ite.hasNext()){
+					StockList item = ite.next();
+					JMenuItem itemM = new JMenuItem(item.getSymbol() +" - " + item.getCreatedOn());
+					itemM.addActionListener(new ActionListener() {;
+						public void actionPerformed(ActionEvent arg0) {
+							history.displayHistoryFrame(aCount--);
+						}
+					});
+					mnHistory.add(itemM);	
+				}
+		}
 }

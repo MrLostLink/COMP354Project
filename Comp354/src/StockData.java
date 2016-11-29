@@ -3,11 +3,14 @@ import java.text.DecimalFormat;
 import java.util.Date;
 /**
  * Created by Kendy on 2016-10-16.
+ * Adjusted by Mandeep on 2016-11-27
+ * 
+ * This class is used to store a single Stock Data Point
  */
 public class StockData implements Serializable{
 
-    /**
-	 * 
+    /*
+	 *	Declaration of Variables
 	 */
 	private static final long serialVersionUID = 1L;
 	String	symbol;
@@ -19,6 +22,9 @@ public class StockData implements Serializable{
     Date	stockDate;
     DecimalFormat decimalFormat = new DecimalFormat("#,##0");
 
+    /*
+     * Constructor
+     */
     public StockData(){}
     
     public StockData(String symbol, double highPrice, double lowPrice, double closePrice, double openPrice, long volume, Date stockDate) {
@@ -32,6 +38,9 @@ public class StockData implements Serializable{
 		this.openPrice =openPrice;
 	}
 
+    /*
+     * Getter/Setter Methods
+     */
 	public String getSymbol() {
 		return symbol;
 	}
@@ -95,6 +104,9 @@ public class StockData implements Serializable{
 	public void setOpenPrice(double openPrice){
 		this.openPrice = openPrice;
 	}
+	/*
+	 * Equivalent to .toString() method
+	 */
 	public String getQuotes(){
         return   "Ticker Symbol: " + this.getSymbol() + "\n" +
                 "High Price of Stock: $"  + this.getHighPrice() + "\n" +
