@@ -27,7 +27,8 @@ public class History{
 	/*
 	 * Declaration/Initialization of Variables
 	 */
-	private String filePath = "C:\\Users\\Mande\\workspace\\COMP354Project\\COMP354Project\\data";
+	private String filePath = System.getProperty("user.dir");
+			//"C:\\Users\\Mande\\workspace\\COMP354Project\\COMP354Project\\data";
 	private String fileName = "datalist.bin";
 	private FileOutputStream fileOut = null;
 	private ObjectOutputStream objOut = null;

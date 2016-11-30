@@ -59,7 +59,7 @@ public class MyApp {
 			public void run() {
 				try {
 					MyApp window = new MyApp();
-					window.frame.setVisible(true);
+					window.getFrame().setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -82,10 +82,10 @@ public class MyApp {
 		/*
 		 * Overall Frame of Application
 		 */
-		frame = new JFrame();
-		frame.setBounds(100, 100, 780, 650);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().setLayout(null);
+		setFrame(new JFrame());
+		getFrame().setBounds(100, 100, 780, 650);
+		getFrame().setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		getFrame().getContentPane().setLayout(null);
 		Date todaysDate = new Date();
 		todaysDate.getDate();
 		Date minDate = new Date(todaysDate.getYear()-5, todaysDate.getMonth(), todaysDate.getDay());
@@ -118,7 +118,7 @@ public class MyApp {
 		History history = new History();
 		menuBar.add(mnHistory);
 		createHistoryMenu(mnHistory, menuBar, history);
-		frame.setJMenuBar(menuBar);
+		getFrame().setJMenuBar(menuBar);
 		
 		
 		/*
@@ -126,7 +126,7 @@ public class MyApp {
 		 */
 		JLabel lblNewLabel = new JLabel("Company Name:");
 		lblNewLabel.setBounds(138, 8, 128, 14);
-		frame.getContentPane().add(lblNewLabel);
+		getFrame().getContentPane().add(lblNewLabel);
 		
 		/*
 		 * GUI Button to select starting Date
@@ -135,7 +135,7 @@ public class MyApp {
 		dateFrom.setMinSelectableDate(minDate);
 		dateFrom.setBounds(276, 33, 128, 20);
 		dateFrom.setMaxSelectableDate(todaysDate);
-		frame.getContentPane().add(dateFrom);
+		getFrame().getContentPane().add(dateFrom);
 		
 		/*
 		 * GUI Button to select ending Date
@@ -149,21 +149,21 @@ public class MyApp {
 		});
 		dateUntil.setBounds(276, 64, 128, 20);
 		dateUntil.setMaxSelectableDate(todaysDate);
-		frame.getContentPane().add(dateUntil);
+		getFrame().getContentPane().add(dateUntil);
 		
 		/*
 		 *  A Label
 		 */
 		JLabel lblFrom = new JLabel("From:");
 		lblFrom.setBounds(138, 33, 128, 14);
-		frame.getContentPane().add(lblFrom);
+		getFrame().getContentPane().add(lblFrom);
 		
 		/*
 		 *  A Label
 		 */
 		JLabel lblUntil = new JLabel("Until:");
 		lblUntil.setBounds(138, 64, 128, 14);
-		frame.getContentPane().add(lblUntil);
+		getFrame().getContentPane().add(lblUntil);
 		
 		/*
 		 *  List of Combo items corresponding to available companies 
@@ -175,20 +175,20 @@ public class MyApp {
 			ComboItem item = new ComboItem(str,str);
 			companyBox.addItem(item);
 		}
-		frame.getContentPane().add(companyBox);
+		getFrame().getContentPane().add(companyBox);
 		
 		
 		JPanel graphPanel = new JPanel();
 		graphPanel.setBounds(10, 105, 744, 449);
-		frame.getContentPane().add(graphPanel);
+		getFrame().getContentPane().add(graphPanel);
 		
 		JLabel PR = new JLabel("Purchase Recommendation :");
 		PR.setBounds(138, 91, 175, 14);
-		frame.getContentPane().add(PR);
+		getFrame().getContentPane().add(PR);
 		
 		JLabel Recommendation = new JLabel("");
 		Recommendation.setBounds(315, 91, 175, 14);
-		frame.getContentPane().add(Recommendation);
+		getFrame().getContentPane().add(Recommendation);
 		
 		/*
 		 * Action performed will create Graph based on dataset
@@ -242,7 +242,7 @@ public class MyApp {
 							dataList = stock.getHistory(startDate, endDate, selectedInterval);
 						}
 					} catch (IOException e1) {
-						JOptionPane.showMessageDialog(frame,
+						JOptionPane.showMessageDialog(getFrame(),
 							    "Make sure you are connected to the Internet.\n" +
 							    "Contact your system admin if error continues.", 
 							    "An Error has occured.",
@@ -314,11 +314,11 @@ public class MyApp {
 			}
 		});
 		btnNewButton.setBounds(406, 8, 89, 76);
-		frame.getContentPane().add(btnNewButton);
+		getFrame().getContentPane().add(btnNewButton);
 		
 		JDesktopPane desktopPane = new JDesktopPane();
 		desktopPane.setBounds(556, 64, 1, 1);
-		frame.getContentPane().add(desktopPane);		
+		getFrame().getContentPane().add(desktopPane);		
 		
 	}
 	
@@ -329,6 +329,7 @@ public class MyApp {
 		double priceOfStock = stock.getQuote().getPrice().doubleValue();
 		System.out.println("Price of the stock : " + priceOfStock);
 		double fiftyDayMA = stock.getQuote().getPriceAvg50().doubleValue();
+		
 		System.out.println("50 days moving average : " + fiftyDayMA);
 		
 		//Formulae from recommendation
@@ -359,4 +360,12 @@ public class MyApp {
 					mnHistory.add(itemM);	
 				}
 		}
+
+	public JFrame getFrame() {
+		return frame;
+	}
+
+	public void setFrame(JFrame frame) {
+		this.frame = frame;
+	}
 }
